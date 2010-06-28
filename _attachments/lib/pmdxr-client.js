@@ -32,7 +32,7 @@
 		else if (instance.iFrame.attachEvent)
 			instance.iFrame.attachEvent("onload", onloadHandler);
 
-		instance.iFrame.src = instance.origin + "/_design/couchdb-xdr/receiver.html";
+		instance.iFrame.src = instance.origin + "/couchdb-xd/_design/couchdb-xd/receiver.html";
 		if (typeof onload == "function") {
 			instance.onload = onload;
 			instance.init();

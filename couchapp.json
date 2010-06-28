@@ -1,0 +1,4 @@
+{
+    "name": "couchdb-xd",
+    "description": "JS lib for making cross-domain XHR requests to CouchDB"
+}

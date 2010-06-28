@@ -20,7 +20,7 @@
 		var instance = this; // for YUI compressor
 		instance.iFrame	= document.createElement("iframe"); // interface frame
 		instance.iFrame.style.display = "none";
-		instance.origin = host.replace(pmxdr.originRegex, "$1");
+		instance.origin = host.replace(pmxdr.originRegex, "$1$3");
 		
 		function onloadHandler() {
 			if (typeof instance.onload == "function")
@@ -39,7 +39,7 @@
 		}
 	}
 	
-	pmxdr.originRegex = /^([\w-]+:\/*\[?[\w\.:-]+\]?(?::\d+)?).*/; // RegExp.$1 = protocol+host+port (the square brackets are for ipv6)
+	pmxdr.originRegex = /^([\w-]+:\/*)(\w+\:\w+@)?(\[?[\w\.:-]+\]?(?::\d+)?).*/; // RegExp.$1 = protocol+host+port (the square brackets are for ipv6)
 	pmxdr.request = function(req) {
 		if (typeof req == "string")
 			return pmxdr.request({uri: req});

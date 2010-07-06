@@ -37,62 +37,60 @@ window.Couch = (function() {
   };
 
   Couch.Server.prototype = {
+
     getDatabase: function(name) {
       return new Couch.Database(this, name);
+    },
+
+    request: function(url, params) {
+      params.uri = this.host + '/' + url;
+      params.headers = {
+        'Authorization': "Basic " + Base64.encode(this.user + ':' + this.pass)
+      };
+      pmxdr.request(params);
     }
   };
 
   Couch.Database = function(server, name) {
     this.name = name;
-    this.url = server.host + '/' + name;
   };
 
   Couch.Database.get = function(server, name, callback) {
-    pmxdr.request({
-      uri: server.host + '/' + name,
+    server.request(name, {
       method: "GET",
-      callback: callback,
-      headers: {
-        'Authorization': "Basic " + Base64.encode(server.user + ':' + server.pass)
-      }
+      callback: callback
     });
   };
 
   Couch.Database.destroy = function(server, name, callback, rev) {
-    pmxdr.request({
-      uri: server.host + '/' + name,
+    server.request(name, {
       method: "DELETE",
-      callback: callback,
-      headers: {
-        'Authorization': "Basic " + Base64.encode(server.user + ':' + server.pass)
-      }
+      callback: callback
     });
   };
 
   Couch.Database.create = function(server, name, callback) {
-    pmxdr.request({
-      uri: server.host + '/' + name,
+    server.request(name, {
       method: "PUT",
-      callback: callback,
-      headers: {
-        'Authorization': "Basic " + Base64.encode(server.user + ':' + server.pass)
-      }
+      callback: callback
     });
   };
 
   Couch.Database.prototype = {
+    request: function(name, params) {
+      server.request(this.name + '/' + name, params);
+    },
+
     get: function(name, callback) {
       var self = this;
-      pmxdr.request({
-        uri: self.url + '/' + name,
+      this.request(name, {
         callback: callback
       });
     },
 
     put: function(name, data, callback) {
       var self = this;
-      pmxdr.request({
-        uri: self.url + '/' + name,
+      this.request(name, {
         method: "PUT",
         data: JSON.stringify(data),
         callback: callback

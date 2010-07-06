@@ -41,27 +41,27 @@ if (this.JSON && (!JSON.stringify || !JSON.parse))
 
   function pmxdrRequestHandler(evt) {
     var alwaysTrusted = false, data = JSON.parse(evt.data), origin = evt.origin, sourceWindow = evt.source;
-    
+
     if (data.pmxdr == true) { // only handle pmxdr requests
     // accept anything value that is == to true
-    
+
       for (var i=0; i<alwaysTrustedOrigins.length; i++) {
         if (alwaysTrustedOrigins[i] instanceof RegExp)
           alwaysTrusted = alwaysTrustedOrigins[i].test(origin);
         else if (typeof alwaysTrustedOrigins[i] == "string")
           alwaysTrusted = (origin === alwaysTrustedOrigins[i]);
       }
-      
+
       if (typeof data.method == "string") data.method = data.method.toUpperCase();
-      
+
       var req = new XMLHttpRequest();
       req.open(data.method, data.uri, true);
-      
+
       if (data.headers)
         for (var header in data.headers)
           if (data.headers.hasOwnProperty(header))
             req.setRequestHeader(header, data.headers[header]);
-      
+
       if (typeof data.data == "string") req.send(data.data)
       else req.send(null);
 
@@ -79,17 +79,17 @@ if (this.JSON && (!JSON.stringify || !JSON.parse))
 
       req.onreadystatechange = function() {
         if (this.readyState == 4) {
-          if (this.status == 200) {
+          if (this.status == 200 || this.status == 201) {
             function getResponseHeader(header) {
               return req.getResponseHeader(header)
             }
-        
+
             var ac = { // access controls
               origin : (getResponseHeader("Access-Control-Allow-Origin")||"").replace(/\s/g, ""),
               methods: (getResponseHeader("Access-Control-Allow-Methods")||"").replace(/\s/g, "")
               //,headers: (getResponseHeader("Access-Control-Allow-Headers")||"").replace(/\s/g, "")
             };
-        
+
             if ( // determine if origin is trusted
                  alwaysTrusted == true
                  || ac.origin == "*"
@@ -108,13 +108,13 @@ if (this.JSON && (!JSON.stringify || !JSON.parse))
                   status     : (typeof req.status == "number") ? req.status : null, // possible 0, check for type
                   statusText : req.statusText || null,
                 }; if (typeof data.id != "undefined") response.id = data.id;
-            
+
                 var responseHeaders = this.getAllResponseHeaders().split(/\r?\n/);
                 for (var i=0; i<responseHeaders.length; i++) {
                   var header = responseHeaders[i].split(": ");
                   response.headers[header[0].toLowerCase()] = header[1];
                 }
-                
+
                 return sourceWindow.postMessage(JSON.stringify(response), origin)
               } else return err("DISALLOWED_REQUEST_METHOD"); // The request method was not allowed
             } else return err("DISALLOWED_ORIGIN"); // The host was not allowed to request the resource
@@ -123,7 +123,7 @@ if (this.JSON && (!JSON.stringify || !JSON.parse))
       }
     }
   }
-  
+
   if (window.addEventListener) window.addEventListener("message", pmxdrRequestHandler, false); // normal browsers
   else if (window.attachEvent) window.attachEvent("onmessage", pmxdrRequestHandler); // IE
 })();

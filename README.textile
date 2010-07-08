@@ -1,0 +1,72 @@
+h1. couchdb-xd
+
+Cross-domain AJAX for CouchDB, distributed as a CouchApp.
+
+h2. Installation
+
+<pre>$ git clone git@github.com:benvinegar/couchdb-xd.git
+$ couchapp push . http://user:pass@your-couch-host.com/couchdb-xd
+</pre>
+
+NOTE: At the moment, couchdb-xd must be installed in a database named couchdb-xd.
+
+Afterwards, include the following script tag in your app/web page:
+
+<pre>
+<script src="http://your-couch-host.com/couchdb-xd/_design/couchdb-xd/couchdb.js" type="text/javascript"></script>
+</pre>
+
+You'll now have access to the Couch global JavaScript object, which exposes a number of utility classes and methods for manipulating any CouchDB database hosted on that domain.
+
+h2. Usage
+
+Create a new server instance.
+
+<pre>
+var server = new Couch.Server('http://localhost:5984', function() {
+  // execute on ready
+});
+</pre>
+
+Get, delete, and create a database.
+
+<pre>
+Couch.Database.get(server, 'dbname', function(resp) { });
+
+Couch.Database.destroy(server, 'dbname', function(resp) { });
+
+Couch.Database.create(server, 'dbname', function(resp) { });
+</pre>
+
+Get, delete, and create a document.
+
+<pre>
+var db = new Couch.Database(server, 'dbname');
+
+db.get('some-record', function(resp) { });
+
+db.destroy('some-record', { rev: 'abcdef123456789' }, function(resp) { });
+
+db.put('some-record', { hello: 'world' }, function(resp) { });
+</pre>
+
+h2. Unit Tests
+
+After installing, you can run the provided unit tests at: 
+
+"http://your-couch-host.com/couchdb-xd/_design/couchdb-xd/test/index.html":http://your-couch-host.com/couchdb-xd/_design/couchdb-xd/test/index.html
+
+h2. Caveats
+
+Only works with browsers that support window.postMessage (IE8+, Firefox 3.5+, Safari 4+, Chrome).
+
+h2. Todo
+
+ * Document API
+ ** MOVE, COPY, DELETE, _all_docs
+ ** "http://wiki.apache.org/couchdb/HTTP_Document_API":http://wiki.apache.org/couchdb/HTTP_Document_API
+ * Database API
+ ** _changes, _all_dbs
+ ** "http://wiki.apache.org/couchdb/HTTP_database_API":http://wiki.apache.org/couchdb/HTTP_database_API
+ * Support non-postMessage browsers
+ * Support arbitrary install locations

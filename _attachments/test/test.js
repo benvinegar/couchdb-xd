@@ -3,9 +3,9 @@ Couch.init(function() {
 
   function setup(callback) {
     // Recreate the test server each test
-    Couch.Database.get(server, 'couchdb_xd_test', function(response) {
-      Couch.Database.destroy(server, 'couchdb_xd_test', function(response) {
-        Couch.Database.create(server, 'couchdb_xd_test', callback);
+    server.get(server, 'couchdb_xd_test', function(response) {
+      server.destroy(server, 'couchdb_xd_test', function(response) {
+        server.create(server, 'couchdb_xd_test', callback);
       });
     });
   }

@@ -55,10 +55,6 @@ window.Couch = (function() {
 
   Couch.Server.prototype = {
 
-    getDatabase: function(name) {
-      return new Couch.Database(this, name);
-    },
-
     request: function(url, params) {
       params.uri = this.host + '/' + url;
       if (params.data) {
@@ -95,6 +91,27 @@ window.Couch = (function() {
         }
       }
       pmxdr.request(params);
+    },
+
+    get: function(server, name, callback) {
+      server.request(name, {
+        method: "GET",
+        callback: callback
+      });
+    },
+
+    destroy: function(server, name, callback, rev) {
+      server.request(name, {
+        method: "DELETE",
+        callback: callback
+      });
+    },
+
+    create: function(server, name, callback) {
+      server.request(name, {
+        method: "PUT",
+        callback: callback
+      });
     }
   };
 
@@ -106,27 +123,6 @@ window.Couch = (function() {
   Couch.Database = function(server, name) {
     this.server = server;
     this.name = name;
-  };
-
-  Couch.Database.get = function(server, name, callback) {
-    server.request(name, {
-      method: "GET",
-      callback: callback
-    });
-  };
-
-  Couch.Database.destroy = function(server, name, callback, rev) {
-    server.request(name, {
-      method: "DELETE",
-      callback: callback
-    });
-  };
-
-  Couch.Database.create = function(server, name, callback) {
-    server.request(name, {
-      method: "PUT",
-      callback: callback
-    });
   };
 
   Couch.Database.prototype = {

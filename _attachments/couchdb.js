@@ -64,6 +64,14 @@ window.Couch = (function() {
           'Authorization': "Basic " + Base64.encode(this.user + ':' + this.pass)
         };
       }
+      var callback = params.callback;
+      params.callback = function(resp) {
+        if (resp.status >= 200 && resp.status < 300) {
+          callback(JSON.parse(resp.data));
+        } else {
+          callback(resp);
+        }
+      }
       pmxdr.request(params);
     }
   };

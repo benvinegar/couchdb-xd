@@ -47,6 +47,18 @@ window.Couch = (function() {
 
     request: function(url, params) {
       params.uri = this.host + '/' + url;
+      if (params.data) {
+        if (params.method != 'POST' && params.method != 'PUT') {
+          var queryParams = [];
+          for (var k in params.data) {
+            queryParams.push(k + '=' + params.data[k]);
+          }
+          params.uri += '?' + queryParams.join('&');
+          delete(params.data);
+        } else {
+          params.data = JSON.stringify(params.data);
+        }
+      }
       if (typeof this.user === 'string') {
         params.headers = {
           'Authorization': "Basic " + Base64.encode(this.user + ':' + this.pass)
@@ -91,21 +103,27 @@ window.Couch = (function() {
     },
 
     get: function(name, callback) {
-      var self = this;
       this.request(name, {
         callback: callback
       });
     },
 
     put: function(name, data, callback) {
-      var self = this;
       this.request(name, {
         method: "PUT",
-        data: JSON.stringify(data),
+        data: data,
+        callback: callback
+      });
+    },
+
+    destroy: function(name, data, callback) {
+      this.request(name, {
+        method: "DELETE",
+        data: data,
         callback: callback
       });
     }
-  };
+  }
 
 
   /**

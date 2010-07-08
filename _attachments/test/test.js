@@ -29,7 +29,22 @@ var server = new Couch.Server('http://localhost:5984', function() {
         db.get('new-record', function(resp) {
           start();
           var data = JSON.parse(resp.data);
+          // TODO: normalize '_id' vs 'id'
           equals(data._id, 'new-record');
+        });
+      });
+    });
+  });
+
+  test('can delete a record', 1, function() {
+    stop();
+    setup(function() {
+      db.put('new-record', { hello: 'world' }, function(resp) {
+        var data = JSON.parse(resp.data);
+        db.destroy('new-record', { rev: data.rev }, function(resp) {
+          start();
+          var data = JSON.parse(resp.data);
+          equals(data.ok, true);
         });
       });
     });

@@ -1,4 +1,6 @@
-var server = new Couch.Server('http://localhost:5984', function() {
+Couch.init(function() {
+  var server = new Couch.Server('http://localhost:5984', 'admin', 'pass');
+
   function setup(callback) {
     // Recreate the test server each test
     Couch.Database.get(server, 'couchdb_xd_test', function(response) {
@@ -45,4 +47,4 @@ var server = new Couch.Server('http://localhost:5984', function() {
       });
     });
   });
-}, 'admin', 'pass');
+});

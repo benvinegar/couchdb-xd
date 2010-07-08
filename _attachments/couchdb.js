@@ -19,25 +19,38 @@
 window.Couch = (function() {
   var Couch = {};
 
+  Couch.init = function(onready) {
+    var scripts = document.getElementsByTagName('script');
+    for (var i = 0; i < scripts.length; i++) {
+      var tag = scripts[i];
+      if (typeof tag.src !== 'string' ||
+          tag.src.indexOf('couchdb.js') === -1)
+      {
+        continue;
+      }
+
+      var script = document.createElement('script');
+      script.src = tag.src.replace(/couchdb\.js/, 'lib/pmdxr-client.js');
+      script.async = true;
+      var body = document.getElementsByTagName('body')[0];
+      body.appendChild(script);
+      var interval = setInterval(function() {
+        if (typeof pmxdr !== 'undefined') {
+          clearInterval(interval);
+          onready();
+        }
+      }, 100);
+    }
+  };
+
   /**
    * CouchDB server object; exposes database-level instance methods
    */
-  Couch.Server = function(host, onready, user, pass) {
+  Couch.Server = function(host, user, pass) {
     this.host = host;
     this.user = user;
     this.pass = pass;
 
-    var script = document.createElement('script');
-    script.src = host + '/couchdb-xd/_design/couchdb-xd/lib/pmdxr-client.js';
-    script.async = true;
-    var body = document.getElementsByTagName('body')[0];
-    body.appendChild(script);
-    var interval = setInterval(function() {
-      if (typeof pmxdr !== 'undefined') {
-        clearInterval(interval);
-        onready();
-      }
-    }, 100);
   };
 
   Couch.Server.prototype = {
@@ -91,6 +104,7 @@ window.Couch = (function() {
    */
 
   Couch.Database = function(server, name) {
+    this.server = server;
     this.name = name;
   };
 
@@ -117,7 +131,7 @@ window.Couch = (function() {
 
   Couch.Database.prototype = {
     request: function(name, params) {
-      server.request(this.name + '/' + name, params);
+      this.server.request(this.name + '/' + name, params);
     },
 
     get: function(name, callback) {

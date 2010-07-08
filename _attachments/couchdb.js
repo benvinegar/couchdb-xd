@@ -19,6 +19,9 @@
 window.Couch = (function() {
   var Couch = {};
 
+  /**
+   * CouchDB server object; exposes database-level methods
+   */
   Couch.Server = function(host, onready, user, pass) {
     this.host = host;
     this.user = user;
@@ -52,6 +55,10 @@ window.Couch = (function() {
       pmxdr.request(params);
     }
   };
+
+  /**
+   * CouchDB database object; exposes document-level methods
+   */
 
   Couch.Database = function(server, name) {
     this.name = name;

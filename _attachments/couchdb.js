@@ -20,7 +20,7 @@ window.Couch = (function() {
   var Couch = {};
 
   /**
-   * CouchDB server object; exposes database-level methods
+   * CouchDB server object; exposes database-level instance methods
    */
   Couch.Server = function(host, onready, user, pass) {
     this.host = host;
@@ -29,6 +29,7 @@ window.Couch = (function() {
 
     var script = document.createElement('script');
     script.src = host + '/couchdb-xd/_design/couchdb-xd/lib/pmdxr-client.js';
+    script.async = true;
     var body = document.getElementsByTagName('body')[0];
     body.appendChild(script);
     var interval = setInterval(function() {
@@ -48,6 +49,9 @@ window.Couch = (function() {
     request: function(url, params) {
       params.uri = this.host + '/' + url;
       if (params.data) {
+        // If we're not doing a POST or PUT, params should be placed
+        // on query string instead. This should probably be done inside
+        // the pmxdr lib.
         if (params.method != 'POST' && params.method != 'PUT') {
           var queryParams = [];
           for (var k in params.data) {
@@ -59,11 +63,16 @@ window.Couch = (function() {
           params.data = JSON.stringify(params.data);
         }
       }
+
+      // HTTP Basic Authentication
       if (typeof this.user === 'string') {
         params.headers = {
           'Authorization': "Basic " + Base64.encode(this.user + ':' + this.pass)
         };
       }
+
+      // Wrap supplied callback method; deserialize successful response
+      // first
       var callback = params.callback;
       params.callback = function(resp) {
         if (resp.status >= 200 && resp.status < 300) {
@@ -77,7 +86,8 @@ window.Couch = (function() {
   };
 
   /**
-   * CouchDB database object; exposes document-level methods
+   * CouchDB database object; exposes database-level class methods
+   * and document-level instance methods
    */
 
   Couch.Database = function(server, name) {
@@ -131,6 +141,8 @@ window.Couch = (function() {
         callback: callback
       });
     }
+
+    // TODO: MOVE, COPY, POST
   }
 
 

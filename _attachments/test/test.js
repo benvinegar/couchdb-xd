@@ -19,6 +19,19 @@ Couch.init(function() {
   var db = new Couch.Database(server, 'couchdb_xd_test');
   start();
 
+  test('can fetch a record', 1, function() {
+    stop();
+    setup(function() {
+      db.get('sample-record', function(resp) {
+        start();
+        // TODO: normalize '_id' vs 'id'
+        equals(resp._id, 'sample-record');
+      });
+    });
+  });
+
+  // Kind of redundant, seeing as loadFixtures() creates records already, but
+  // figured this should be here anyways.
   test('can create a record', 1, function() {
     stop();
     setup(function() {
@@ -29,13 +42,16 @@ Couch.init(function() {
     });
   });
 
-  test('can fetch a record', 1, function() {
+  test('can update a record', 1, function() {
     stop();
-    setup(function() {
-      db.get('sample-record', function(resp) {
-        start();
-        // TODO: normalize '_id' vs 'id'
-        equals(resp._id, 'sample-record');
+    setup(function(resp) {
+      // To update an existing record, you must supply the _rev property
+      db.put('sample-record', { _rev: resp.rev, hello: 'universe' }, function() {
+        // Fetch that record afterwards, make sure the change took hold
+        db.get('sample-record', function(resp) {
+          start();
+          equals(resp.hello, 'universe');
+        });
       });
     });
   });

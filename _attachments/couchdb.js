@@ -144,15 +144,23 @@ window.Couch = (function() {
       });
     },
 
+    post: function(data, callback) {
+      this.request('', {
+        method: 'POST',
+        data: data,
+        callback: callback
+      });
+    },
+
     destroy: function(name, data, callback) {
       this.request(name, {
         method: "DELETE",
         data: data,
         callback: callback
       });
-    }
+    },
 
-    // TODO: MOVE, COPY, POST
+    // TODO: MOVE, COPY
   }
 
 

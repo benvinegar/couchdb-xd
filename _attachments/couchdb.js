@@ -75,9 +75,11 @@ window.Couch = (function() {
 
       // HTTP Basic Authentication
       if (typeof this.user === 'string') {
-        params.headers = {
-          'Authorization': "Basic " + Base64.encode(this.user + ':' + this.pass)
-        };
+        if (!params.headers) {
+          params.headers = {};
+        }
+        params.headers['Authorization'] =
+          "Basic " + Base64.encode(this.user + ':' + this.pass);
       }
 
       // Wrap supplied callback method; deserialize successful response
@@ -89,7 +91,7 @@ window.Couch = (function() {
         } else {
           callback(resp);
         }
-      }
+      };
       pmxdr.request(params);
     },
 
@@ -116,8 +118,7 @@ window.Couch = (function() {
   };
 
   /**
-   * CouchDB database object; exposes database-level class methods
-   * and document-level instance methods
+   * CouchDB database object; exposes document-level instance methods
    */
 
   Couch.Database = function(server, name) {
@@ -160,7 +161,18 @@ window.Couch = (function() {
       });
     },
 
-    // TODO: MOVE, COPY
+    // Right now data should only contain 'rev'. Should the third
+    // parameter just be 'rev'?
+    copy: function(source, dest, data, callback) {
+      this.request(source, {
+        method: 'COPY',
+        callback: callback,
+        data: data,
+        headers: {
+          Destination: dest
+        }
+      });
+    }
   }
 
 

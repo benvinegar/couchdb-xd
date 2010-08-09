@@ -90,4 +90,17 @@ Couch.init(function() {
       });
     });
   });
+
+  test('can copy a record', 1, function() {
+    stop();
+    setup({ fixtures: true}, function(resp) {
+      db.copy('sample-record', 'new-record', { rev: resp.rev }, function() {
+        // Now try to fetch the new copy
+        db.get('new-record', function(resp) {
+          start();
+          equals(resp.hello, 'world');
+        });
+      });
+    });
+  });
 });

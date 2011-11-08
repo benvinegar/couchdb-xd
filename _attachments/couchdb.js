@@ -149,6 +149,7 @@ window.Couch = (function() {
       this.request('', {
         method: 'POST',
         data: data,
+        contentType: 'application/json',
         callback: callback
       });
     },
